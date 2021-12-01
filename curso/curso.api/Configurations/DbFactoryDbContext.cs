@@ -1,6 +1,7 @@
 ﻿using curso.api.Infraestruture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace curso.api.Configurations
 {
@@ -8,8 +9,12 @@ namespace curso.api.Configurations
     {
         public CursoDBContext CreateDbContext(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                                        .AddJsonFile("appsettings.json")
+                                        .Build();
+
             var optionsBuilder = new DbContextOptionsBuilder<CursoDBContext>();
-            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=CURSO;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             CursoDBContext context = new CursoDBContext(optionsBuilder.Options);
 
             return context;

@@ -28,7 +28,7 @@
             <summary>
             Este serviço permite cadastrar um usuário não existente.
             </summary>
-            <param name="loginViewModelInput">View model do registro de login</param>
+            <param name="registerViewModelInput">View model do registro de login</param>
             <returns>Retorna status OK, dados do usuário e o token em caso de sucesso</returns>
         </member>
     </members>
