@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace curso.api.Controllers
 {
-    [Route("api/cursos")]
+    [Route("api/v1/cursos")]
     [ApiController]
     [Authorize]
     public class CursoController : ControllerBase
@@ -34,16 +34,24 @@ namespace curso.api.Controllers
         [Route("")]
         public async Task<IActionResult> Post(CursoViewModelInput cursoViewModelInput)
         {
-            Curso curso = new Curso();
-            curso.Nome = cursoViewModelInput.Nome;
-            curso.Descricao = cursoViewModelInput.Descricao;            
+            Curso curso = new Curso
+            {
+                Nome = cursoViewModelInput.Nome,
+                Descricao = cursoViewModelInput.Descricao
+            };
             var codigoUsuario = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
             curso.CodigoUsuario = codigoUsuario;
 
             _cursoRepository.Add(curso);
             _cursoRepository.Commit();
 
-            return Created("", cursoViewModelInput);
+            var cursoViewModelOutput = new CursoViewModelOutput()
+            {
+                Nome = curso.Nome,
+                Descricao = curso.Descricao
+            };
+
+            return CreatedAtAction(nameof(Get), curso);
         }
 
         /// <summary>
@@ -56,16 +64,16 @@ namespace curso.api.Controllers
         [Route("")]
         public async Task<IActionResult> Get()
         {
-            var cursos = new List<CursoViewModelOutput>();                      
+                             
 
             var codigoUsuario = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
-            _cursoRepository.GetByUser(codigoUsuario).Select(c => new CursoViewModelOutput()
-            {
-                Nome = c.Nome,
-                Descricao = c.Descricao,
-                Login = c.Usuario.Login
-            });
+            var cursos = _cursoRepository.GetByUser(codigoUsuario).Select(c => new CursoViewModelOutput()
+                    {
+                        Nome = c.Nome,
+                        Descricao = c.Descricao,
+                        Login = c.Usuario.Login
+                    });
 
 
             return Ok(cursos);
